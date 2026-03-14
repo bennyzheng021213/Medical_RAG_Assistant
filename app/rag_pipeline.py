@@ -39,7 +39,7 @@ def build_rag_pipeline():
 
     llm = ChatDeepSeek(
         model='deepseek-chat',
-        api_key="sk-5ddd35384f964300a74ed0245cf41e7b",
+        api_key=DEEPSEEK_API_KEY,
         temperature=0
     ) 
 
