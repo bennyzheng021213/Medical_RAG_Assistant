@@ -25,7 +25,7 @@ A medical question-answering assistant based on Retrieval-Augmented Generation (
 
 ### 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone git@github.com:bennyzheng021213/Medical_RAG_Assistant.git
 cd rag_system
 ```
 
