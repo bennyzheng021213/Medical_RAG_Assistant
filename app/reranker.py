@@ -1,20 +1,24 @@
+from functools import lru_cache
+
 from sentence_transformers import CrossEncoder
 
-reranker = CrossEncoder(
-    "BAAI/bge-reranker-base"
 
-) 
+@lru_cache(maxsize=1)
+def _get_reranker():
+    return CrossEncoder("BAAI/bge-reranker-base")
+
 
 def rerank_documents(query, docs):
-    pairs = [(query, doc.page_content) for doc in docs]
+    if not docs:
+        return []
 
-    scores = reranker.predict(pairs) 
-    
+    pairs = [(query, doc.page_content) for doc in docs]
+    scores = _get_reranker().predict(pairs)
+
     ranked = sorted(
         zip(scores, docs),
-        key=lambda x: x[0],
-        reverse=True
-
+        key=lambda item: item[0],
+        reverse=True,
     )
 
     return [doc for _, doc in ranked[:3]]

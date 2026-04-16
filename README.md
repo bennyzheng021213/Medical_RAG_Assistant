@@ -1,135 +1,118 @@
 # Medical RAG Assistant
 
-A medical question-answering assistant based on Retrieval-Augmented Generation (RAG), specifically designed to answer healthcare-related questions.
+A document-grounded medical QA assistant built with a Python RAG backend and a standalone Vue frontend.
+
+## Stack
+
+- Backend: FastAPI
+- Frontend: Vue 3 + Vite
+- RAG framework: LangChain
+- Vector store: FAISS
+- Embedding model: `sentence-transformers/all-MiniLM-L6-v2`
+- Re-ranker: `BAAI/bge-reranker-base`
+- LLM: DeepSeek Chat
 
 ## Features
 
-- 📚 **Multi-document Support**: Supports PDF format medical documents
-- 🔍 **Hybrid Retrieval**: Combines BM25 and vector retrieval systems
-- 🎯 **Intelligent Re-ranking**: Uses BGE re-ranking model to optimize retrieval results
-- 💬 **Conversation Memory**: Supports multi-turn dialogue context memory
-- 🌐 **Web Interface**: User-friendly interface based on Streamlit
-- 🚀 **Efficient Retrieval**: Accelerates similarity search using FAISS vector database
-
-## Tech Stack
-
-- **Frontend Interface**: Streamlit
-- **RAG Framework**: LangChain
-- **Vector Database**: FAISS
-- **Embedding Model**: sentence-transformers/all-MiniLM-L6-v2
-- **Re-ranking Model**: BAAI/bge-reranker-base
-- **LLM**: DeepSeek Chat
-- **Document Processing**: PyPDF
-
-## Installation
-
-### 1. Clone the repository
-```bash
-git clone git@github.com:bennyzheng021213/Medical_RAG_Assistant.git
-cd rag_system
-```
-
-### 2. Create virtual environment (recommended)
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or
-venv\Scripts\activate  # Windows
-```
-
-### 3. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure environment variables
-Create a `.env` file and add your DeepSeek API key:
-```
-DEEPSEEK_API_KEY=your_api_key_here
-```
-
-### 5. Prepare data
-Place PDF documents in the `data/` directory.
-
-## Usage
-
-### Launch the application
-```bash
-streamlit run streamlit_app.py
-```
-
-### Access the application
-Open your browser and navigate to: `http://localhost:8501`
-
-### Usage workflow
-1. Enter medical-related questions in the input box
-2. The system retrieves relevant information from documents
-3. Generates context-based answers
-4. Displays answers and citation sources
+- PDF-based medical document ingestion
+- Hybrid retrieval with BM25 + dense vector search
+- Re-ranked evidence passages
+- API-driven architecture without Streamlit
+- Rich frontend with:
+  - knowledge base overview
+  - multi-message conversation area
+  - quick prompt shortcuts
+  - evidence cards showing retrieved passages
 
 ## Project Structure
 
+```text
+Medical_RAG_Assistant/
+├── app/
+│   ├── api.py
+│   ├── ingestion.py
+│   ├── memory.py
+│   ├── rag_pipeline.py
+│   ├── reranker.py
+│   ├── retriever.py
+│   └── vectorstore.py
+├── data/
+├── frontend/
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   └── src/
+│       ├── App.vue
+│       ├── main.js
+│       └── styles.css
+├── requirements.txt
+└── vectorstore/
 ```
-rag_system/
-├── app/                    # Core modules
-│   ├── ingestion.py       # Document loading
-│   ├── vectorstore.py     # Vector store construction
-│   ├── retriever.py       # Hybrid retriever
-│   ├── reranker.py        # Re-ranking module
-│   ├── memory.py          # Conversation memory
-│   └── rag_pipeline.py    # RAG pipeline
-├── data/                  # PDF document data
-├── vectorstore/           # Vector storage
-│   └── faiss_index/       # FAISS index files
-├── streamlit_app.py       # Streamlit application entry
-├── requirements.txt       # Python dependencies
-├── README.md              # Project documentation
-└── .env                   # Environment variables (need to create manually)
+
+## Setup
+
+### 1. Python backend
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-## Configuration
+Create `.env`:
 
-### Environment Variables
-- `DEEPSEEK_API_KEY`: DeepSeek API key (required)
+```env
+DEEPSEEK_API_KEY=your_deepseek_api_key
+```
 
-### Model Configuration
-- Embedding model: `sentence-transformers/all-MiniLM-L6-v2`
-- Re-ranking model: `BAAI/bge-reranker-base`
-- LLM model: `deepseek-chat`
+You can create it from the template:
 
-### Retrieval Parameters
-- Chunk size: 800 characters
-- Chunk overlap: 100 characters
-- Retrieval count: 4 documents
-- Re-ranking count: 3 documents
-- Hybrid weights: BM25(0.4) + Vector retrieval(0.6)
+```bash
+cp .env.example .env
+```
 
-## Important Notes
+Start backend:
 
-1. **API Key Security**: Do not commit API keys to version control systems
-2. **Document Format**: Currently supports PDF format documents only
-3. **Hardware Requirements**:
-   - Minimum 8GB RAM
-   - GPU recommended for better embedding and re-ranking performance
-4. **First-time Run**: First run requires building FAISS index, time depends on document count
-5. **Privacy Protection**: Medical data is sensitive, ensure data security
+```bash
+uvicorn app.api:app --reload
+```
 
-## Troubleshooting
+Backend default address:
 
-### Common Issues
-1. **ModuleNotFoundError**: Ensure all dependencies are installed
-2. **API Key Error**: Check API key in `.env` file
-3. **Insufficient Memory**: Reduce chunk size or use smaller embedding model
-4. **PDF Reading Error**: Ensure PDF files are not corrupted and readable
+```text
+http://127.0.0.1:8000
+```
 
-### Getting Help
-If you encounter issues, check:
-- Dependency versions are correct
-- Environment variables are configured
-- Data files exist
+### 2. Vue frontend
 
-## License
-No license specified yet.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Contributing
-Issues and improvement suggestions are welcome.
+Frontend default address:
+
+```text
+http://127.0.0.1:5173
+```
+
+## API Endpoints
+
+- `GET /api/health`
+- `GET /api/overview`
+- `POST /api/chat`
+
+Example request:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question":"What does the document say about hypertension treatment?"}'
+```
+
+## Notes
+
+- The backend loads and caches the knowledge base on first access.
+- The FAISS index is reused if already present in `vectorstore/faiss_index/`.
+- Do not hardcode API keys in source files.

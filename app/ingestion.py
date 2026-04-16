@@ -1,20 +1,20 @@
 import os
+
 from langchain_community.document_loaders import PyPDFLoader
 
-def load_documents(data_path='data'):
+
+def load_documents(data_path="data"):
     documents = []
 
-    for file in os.listdir(data_path):
-        if file.endswith(".pdf"):
-            loader = PyPDFLoader(os.path.join(data_path, file))
+    if not os.path.isdir(data_path):
+        raise FileNotFoundError(f"Data directory not found: {data_path}")
 
-            docs = loader.load()
+    for file_name in sorted(os.listdir(data_path)):
+        if not file_name.endswith(".pdf"):
+            continue
 
-            docs = documents.extend(docs)
+        loader = PyPDFLoader(os.path.join(data_path, file_name))
+        documents.extend(loader.load())
 
-    print(f"Load {len(documents)} pages from PDFs")
-
+    print(f"Loaded {len(documents)} pages from PDFs")
     return documents
-
-# documents = load_documents()
-# print(documents[1])
